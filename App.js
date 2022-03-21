@@ -21,7 +21,7 @@ export default function App() {
   const moveUp = () => {
     Animated.timing(Y_POSITION, {
       toValue: up ? 200 : -200,
-      useNativeDriver: true,
+      useNativeDriver: false,
       duration: 3000
     }).start(toggleUp)
   }
@@ -33,10 +33,16 @@ export default function App() {
     inputRange: [-200, 200],
     outputRange: [100, 0]
   })
+  const rotation = Y_POSITION.interpolate({
+    inputRange: [-200, 200],
+    outputRange: ["-360deg", "360deg"]
+  })
+  const bgColor = Y_POSITION.interpolate({
+    inputRange: [-200, 200],
+    outputRange: ["rgb(255, 99,71)", "rgb(71,166,255)"]
+  })
   Y_POSITION.addListener(() => {
-    console.log("Y: ", Y_POSITION)
-    console.log("opacity: ", opacity)
-    console.log("borderRadius: ", borderRadius)
+    console.log(bgColor)
   })
   return (
     <Container>
@@ -45,7 +51,8 @@ export default function App() {
           style={{
             borderRadius,
             opacity,
-            transform: [{ translateY: Y_POSITION }]
+            backgroundColor: bgColor,
+            transform: [{ rotateY: rotation }, { translateY: Y_POSITION }]
           }} />
       </Pressable>
     </Container>
