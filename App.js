@@ -28,6 +28,13 @@ export default function App() {
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (_, { dx, dy }) => {
       POSITION.setValue({ x: dx, y: dy })
+    },
+    onPanResponderRelease: () => {
+      Animated.spring(POSITION, {
+        toValue: { x: 0, y: 0 },
+        bounciness: 20,
+        useNativeDriver: false
+      }).start()
     }
   })).current
   return (
