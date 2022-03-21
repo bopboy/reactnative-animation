@@ -16,32 +16,32 @@ const AnimatedBox = Animated.createAnimatedComponent(Box)
 
 export default function App() {
   const [up, setUp] = useState(false)
-  const Y_POSITION = useRef(new Animated.Value(200)).current
+  const POSITION = useRef(new Animated.ValueXY({ x: 0, y: 200 })).current
   const toggleUp = () => setUp(prev => !prev)
   const moveUp = () => {
-    Animated.timing(Y_POSITION, {
+    Animated.timing(POSITION, {
       toValue: up ? 200 : -200,
       useNativeDriver: false,
       duration: 3000
     }).start(toggleUp)
   }
-  const opacity = Y_POSITION.interpolate({
+  const opacity = POSITION.y.interpolate({
     inputRange: [-200, 0, 200],
     outputRange: [1, 0.5, 1]
   })
-  const borderRadius = Y_POSITION.interpolate({
+  const borderRadius = POSITION.y.interpolate({
     inputRange: [-200, 200],
     outputRange: [100, 0]
   })
-  const rotation = Y_POSITION.interpolate({
+  const rotation = POSITION.y.interpolate({
     inputRange: [-200, 200],
     outputRange: ["-360deg", "360deg"]
   })
-  const bgColor = Y_POSITION.interpolate({
+  const bgColor = POSITION.y.interpolate({
     inputRange: [-200, 200],
     outputRange: ["rgb(255, 99,71)", "rgb(71,166,255)"]
   })
-  Y_POSITION.addListener(() => {
+  POSITION.addListener(() => {
     console.log(bgColor)
   })
   return (
@@ -52,7 +52,7 @@ export default function App() {
             borderRadius,
             opacity,
             backgroundColor: bgColor,
-            transform: [{ rotateY: rotation }, { translateY: Y_POSITION }]
+            transform: [{ rotateY: rotation }, { translateY: POSITION.y }]
           }} />
       </Pressable>
     </Container>
