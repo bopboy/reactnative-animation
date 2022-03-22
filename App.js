@@ -1,53 +1,45 @@
-import React, { useState, useRef } from 'react'
-import { Animated, PanResponder } from 'react-native'
+import React, { useRef } from 'react'
+import { Animated, PanResponder, View } from 'react-native'
 import styled from 'styled-components/native'
+import { Ionicons } from '@expo/vector-icons'
 
 const Container = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
+  background-color: #00a8ff;
 `
-const Box = styled.View`
-  background-color: tomato;
+const Card = styled(Animated.createAnimatedComponent(View))`
+  background-color: white;
   width: 200px;
   height: 200px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 `
-const AnimatedBox = Animated.createAnimatedComponent(Box)
 
 export default function App() {
-  const POSITION = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current
-  const borderRadius = POSITION.y.interpolate({
-    inputRange: [-200, 200],
-    outputRange: [100, 0]
-  })
-  const bgColor = POSITION.y.interpolate({
-    inputRange: [-200, 200],
-    outputRange: ["rgb(255, 99,71)", "rgb(71,166,255)"]
-  })
   const panResponder = useRef(PanResponder.create({
     onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (_, { dx, dy }) => {
-      console.log("Touch Move")
-      POSITION.setValue({ x: dx, y: dy })
-    },
-    onPanResponderGrant: () => {
-      console.log("Touch Started")
-      POSITION.setOffset({ x: POSITION.x._value, y: POSITION.y._value })
-    },
+    onPanResponderMove: (_, { dx }) => { position.setValue(dx) },
+    onPanResponderGrant: () => onPressIn(),
     onPanResponderRelease: () => {
-      console.log("Touch Finished")
-      POSITION.flattenOffset()
+      Animated.parallel([
+        onPressOut,
+        Animated.spring(position, { toValue: 0, useNativeDriver: true })
+      ]).start()
     }
   })).current
+  const scale = useRef(new Animated.Value(1)).current
+  const position = useRef(new Animated.Value(0)).current
+  const onPressIn = () => Animated.spring(scale, { toValue: 0.90, useNativeDriver: true }).start()
+  const onPressOut = () => Animated.spring(scale, { toValue: 1, useNativeDriver: true })
   return (
     <Container>
-      <AnimatedBox
-        {...panResponder.panHandlers}
-        style={{
-          borderRadius,
-          backgroundColor: bgColor,
-          transform: [...POSITION.getTranslateTransform()]
-        }} />
+      <Card {...panResponder.panHandlers} style={{ transform: [{ scale }, { translateX: position }] }}>
+        <Ionicons name="pizza" color="#192a56" size={98} />
+      </Card>
     </Container>
   )
 }
