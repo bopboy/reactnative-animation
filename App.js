@@ -45,8 +45,20 @@ export default function App() {
   const onPressIn = Animated.spring(scale, { toValue: 0.90, useNativeDriver: true })
   const onPressOut = Animated.spring(scale, { toValue: 1, useNativeDriver: true })
   const onCenter = Animated.spring(position, { toValue: 0, useNativeDriver: true })
-  const goLeft = Animated.spring(position, { toValue: -SCREEN_WIDTH, tension: 5, useNativeDriver: true })
-  const goRight = Animated.spring(position, { toValue: SCREEN_WIDTH, tension: 5, useNativeDriver: true })
+  const goLeft = Animated.spring(position, {
+    toValue: -SCREEN_WIDTH,
+    tension: 5,
+    useNativeDriver: true,
+    restDisplacementThreshold: 50,
+    restSpeedThreshold: 50
+  })
+  const goRight = Animated.spring(position, {
+    toValue: SCREEN_WIDTH,
+    tension: 5,
+    useNativeDriver: true,
+    restDisplacementThreshold: 50,
+    restSpeedThreshold: 50
+  })
   const [index, setIndex] = useState(0)
   const onDismiss = () => {
     scale.setValue(1)
