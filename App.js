@@ -62,12 +62,20 @@ export default function App() {
         Animated.sequence([
           Animated.parallel([onDropScale, onDropOpacity]),
           Animated.timing(position, { toValue: 0, duration: 100, easing: Easing.linear, useNativeDriver: true })
-        ]).start()
+        ]).start(nextIcon)
       } else {
         Animated.parallel([goHome, onPressOut]).start()
       }
     }
   })).current
+  const [index, setIndex] = useState(0)
+  const nextIcon = () => {
+    Animated.parallel([
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+      Animated.spring(opacity, { toValue: 1, useNativeDriver: true })
+    ]).start()
+    setIndex(prev => prev + 1)
+  }
   return (
     <Container>
       <Edge>
@@ -80,7 +88,7 @@ export default function App() {
           {...panResponder.panHandlers}
           style={{ opacity, transform: [...position.getTranslateTransform(), { scale }] }}
         >
-          <Ionicons name="beer" color={GREY} size={76} />
+          <Ionicons name={icons[index]} color={GREY} size={76} />
         </IconCard>
       </Center>
       <Edge>
