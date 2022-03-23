@@ -1,8 +1,10 @@
-import React, { useRef } from 'react'
-import { Animated, PanResponder, View } from 'react-native'
+import React, { useState, useRef } from 'react'
+import { Animated, PanResponder, View, Dimensions } from 'react-native'
 import styled from 'styled-components/native'
 import { Ionicons } from '@expo/vector-icons'
+import icons from './icons'
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window')
 const Container = styled.View`
   flex: 1;
   justify-content: center;
@@ -43,17 +45,23 @@ export default function App() {
   const onPressIn = Animated.spring(scale, { toValue: 0.90, useNativeDriver: true })
   const onPressOut = Animated.spring(scale, { toValue: 1, useNativeDriver: true })
   const onCenter = Animated.spring(position, { toValue: 0, useNativeDriver: true })
-  const goLeft = Animated.spring(position, { toValue: -500, tension: 5, useNativeDriver: true })
-  const goRight = Animated.spring(position, { toValue: 500, tension: 5, useNativeDriver: true })
-  const closePress = () => { goLeft.start() }
-  const checkPress = () => { goRight.start() }
+  const goLeft = Animated.spring(position, { toValue: -SCREEN_WIDTH, tension: 5, useNativeDriver: true })
+  const goRight = Animated.spring(position, { toValue: SCREEN_WIDTH, tension: 5, useNativeDriver: true })
+  const [index, setIndex] = useState(0)
+  const onDismiss = () => {
+    scale.setValue(1)
+    position.setValue(0)
+    setIndex(prev => prev + 1)
+  }
+  const closePress = () => { goLeft.start(onDismiss) }
+  const checkPress = () => { goRight.start(onDismiss) }
   const panResponder = useRef(PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (_, { dx }) => { position.setValue(dx) },
     onPanResponderGrant: () => onPressIn.start(),
     onPanResponderRelease: (_, { dx }) => {
-      if (dx < -250) goLeft.start()
-      else if (dx > 250) goRight.start()
+      if (dx < -250) goLeft.start(onDismiss)
+      else if (dx > 250) goRight.start(onDismiss)
       else Animated.parallel([onPressOut, onCenter]).start()
     }
   })).current
@@ -61,13 +69,13 @@ export default function App() {
     <Container>
       <CardContainer>
         <Card style={{ transform: [{ scale: secondScale }] }}>
-          <Ionicons name="beer" color="#192a56" size={98} />
+          <Ionicons name={icons[index + 1]} color="#192a56" size={98} />
         </Card>
         <Card
           {...panResponder.panHandlers}
           style={{ transform: [{ scale }, { translateX: position }, { rotateZ: rotation }] }}
         >
-          <Ionicons name="pizza" color="#192a56" size={98} />
+          <Ionicons name={icons[index]} color="#192a56" size={98} />
         </Card>
       </CardContainer>
       <BtnContainer>
